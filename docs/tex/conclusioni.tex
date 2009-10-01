@@ -1,0 +1,192 @@
+\begin{chapter}{Conclusioni}
+
+\begin{section}{Performabilit\`a delle strutture dati}
+Per alcuni problemi sono state testate diverse implementazioni di strutture dati
+che hanno prodotto risultati sostanzialmente diversi. Innanzitutto, come gi\`a
+descritto in \ref{sec:matching}, per risolvere il problema del matching
+abbiamo provato ad utilizzare un albero n-ario canonico. Questo ha portato
+enormi problemi durante la risoluzione del problema dell'unificazione in quanto
+la creazione, nonch\'e l'accesso e la ricerca dei nodi, era troppo lenta per
+i nostri scopi. Si \`e quindi deciso di provare ad utilizzare un heap (vedi
+\ref{sec:matching}) ma allora ci si \`e accorti che la memoria richiesta
+era semplicemente troppa (ricordiamo che, inoltre, l'heap richiede che sia
+allocabile una sezione contigua di memoria). Si \`e allora scelto di utilizzare
+la struttura dati \textit{banale} \verb,vector, messa a disposizione dalla
+libreria standard del C++ modificando per\`o l'algoritmo utilizzato. Questo ha
+apportato un miglioramento notevele delle performance che ci ha permesso di
+risolvere l'unificazione in breve tempo.
+
+Inizialmente, la rappresentazione degli attributi di un fatto avveniva attraverso
+una ricerca sequenziale. Questo approccio funzionava, ma aveva una complessit\`a
+computazionale per la ricerca pari a $O(n)$ che rallentava notevolmente il programma.
+Abbiamo allora dovuto trovare alternative migliori che ci permettessero di diminuire
+i tempi spesi alla ricerca di un determinato attributo.
+Si \`e allora sostituta la ricerca sequenziale con un hash utilizzando la \verb,map,
+messa a disposizione dalla libreria standard del C++. Questo ha pi\`u che dimezzato i
+tempi, utilizzando tralaltro molta meno memoria rispetto alla precedente ricerca
+sequenziale. Questo \`e in parte giustificato dal fatto che la \verb,map, del C++ \`e
+implementata utilizzando un Red-Black tree \cite{Skiena08} che, fornendo le stesse
+funzionalit\`a della ricerca sequenziale, riduceva la complessit\`a computazionale
+della ricerca a $O(\log n)$.
+
+La \verb,map, \`e stata quindi utilizzata anche per tenere in memoria le variabili
+risolte durante l'applicazione di una regola. Tuttavia, effettuando
+\textit{code profiling}, ci siamo accorti spendevamo circa il 30\% del tempo di
+computazione per la ricerca di un elemento all'interno della \verb,map,.
+Abbiamo quindi provato a sostiture l'implementazione corrente della \verb,map,
+basata sui Red-Black trees con un trie \cite{367400}. Tuttavia, questo non
+ha portato i miglioramenti sperati, peggiorando anzi le performance rallentando
+ANT in media di circa il 15\% rispetto all'implementazione con la \verb,map,.
+Si \`e quindi provato ad utilizzare un'implementazione della \verb,map, equivalente
+a quella fornita dal C++ ma questa volta basata su un hash vero e proprio (hashmap).
+Ancora una volta, l'implementazione con i Red-Black trees \`e risultata pi\`u
+veloce, difatti la nostra \verb,map, ha richiesto circa il 50\% di tempo in
+pi\`u per portare a termine il compito.
+
+Nonostante i nostri sforzi, dunque, le strutture dati fornite di default dal C++
+sono risultate essere comunque pi\`u veloci. Sono in ogni caso presenti all'interno
+dei sorgenti di ANT le implementazioni dell'heap, del trie e della hashmap nonostante
+in realt\`a queste non vengano utilizzate all'interno del programma. Le
+implementazioni sono disponibili in \verb,src/ds/heap.h, per l'heap, \verb,src/ds/trie.h,
+per il trie e \verb,src/ds/hashmap.h, per la hashmap.
+\end{section}
+
+\begin{section}{Ottimizzazioni utilizzate}
+Utilizzando la possibilit\`a di effettuare \textit{code profiling}\footnote{
+nell'utilizzo pi\`u semplice, il compilatore tiene traccia del tempo totale
+di esecuzione delle singole funzioni e del numero di volte che le stesse vengono chiamate}
+che ci viene offerta dal compilatore GCC abbiamo individuato dei pattern che ci hanno
+permesso di ottimizzare pi\`u in profondit\`a il codice. All'interno del file \verb,compiler.h,
+nella directory dei sorgenti di ANT, sono definite delle macro che vengono poi riutilizzate
+all'interno del programma per dare indicazioni al compilatore sul comportamento di
+determinate funzioni. Per il momento, l'unico compilatore supportato \`e GCC, ma \`e
+facilmente aggiungibile il supporto per altri compilatori.
+
+In particolare, vale la pena descrivere due di queste macro sebbene ne siano disponibili
+altre che rivestono tuttavia una minore importanza. La prima \`e la clausola
+\verb,__NOTHROW, (definita in GCC come \verb,nothrow,). Questa ci dice che la funzione
+in oggetto non generer\`a eccezioni. Cos\`i facendo, evitiamo che il compilatore generi
+il codice di stack unwind\footnote{il meccanismo di ripristino dello stack nel caso in
+cui un eccezione venga generata} permettendo sia un  risparmio di spazio sull'eseguibile
+finale in termini di byte occupati e sia una velocizzazione dell'esecuzione del codice.
+La seconda clausola presa in considerazione \`e la \verb,__FASTCALL, (definita in GCC
+come \verb,fastcall,); questa dice al compilatore di usare il meccanismo di fastcall per
+chiamare la funzione su cui la clausola \`e specificata, piuttosto che quello classico
+chiamato cdecl. Vale la pena spendere qualche parola in pi\`u sul funzionamento di
+questa particolare ottimizzazione.
+
+Normalmente, quando chiamamo una funzione il compilatore usa il meccanismo di cdecl,
+ovvero i parametri della funzione vengono inseriti nello stack da destra a sinistra\footnote{
+un ulteriore meccanismo molto diffuso chiamato stdcall considera gli argomenti di una
+funzione da sinistra verso destra, ma esistono ulteriori convenzioni utilizzabili ma meno
+diffuse di quelle qui descritte} e successivamente viene effettuata una \verb,call,
+per la funzione richiesta. Questo \`e reso pi\`u chiaro se mostriamo un esempio di codice
+assembler per la chiamata a una generica funzione:
+
+\begin{verbatim}
+funzione(param1, param2, param3);
+\end{verbatim}
+
+\noindent Questa, tradotta in assembler (in notazione Intel) utilizzando il meccanismo di
+cdecl, diviene:
+
+\begin{verbatim}
+push param3
+push param2
+push param1
+call funzione
+\end{verbatim}
+
+\noindent Si pu\`o notare che i parametri vengono passati dall'ultimo verso il primo,
+ovvero da destra a sinistra come descritto in precedenza. Tuttavia, per alcune funzioni
+che vengono chiamate pi\`u di frequente il passaggio di parametri attraverso lo stack
+pu\`o rallentarne la chiamata ed in tal caso \`e consigliabile utilizzare il meccanismo
+di fastcall. Questo consiste nel passare i primi due parametri all'interno di registri
+(per le architetture x86 questi registri sono \verb,ecx, e \verb,edx,) e solo i parametri
+rimanenti tramite lo stack. Il codice assembler risultante sar\`a allora simile al
+seguente:
+
+\begin{verbatim}
+push param3
+mov ecx, param1
+mov edx, param2
+call funzione
+\end{verbatim}
+
+\noindent Sar\`a il compilatore a preoccuparsi di effettuare la gestione e la pulizia
+dei registri prima e dopo l'invocazione di funzione.
+
+Queste ottimizzazioni, unite alle altre meno importanti, ci hanno permesso di recuperare in
+media circa un secondo sull'intero tempo di esecuzione di ANT su vari problemi.
+
+\end{section}
+
+\begin{section}{Possibili miglioramenti}
+Come tutto, ANT \`e migliorabile. In particolare, alcuni aspetti sono stati
+tralasciati in fase di progettazione per la loro minore importanza rispetto
+ad altri requisiti. In particolare, come futuri miglioramenti, si pu\`o
+pensare di:
+
+\begin{itemize}
+	\item riconoscere numeri negativi: allo stato attuale ANT non \`e in grado
+	      di riconoscere valori numerici negativi
+	\item l'albero di espressioni generato al momento %, descritto in \ref{},
+	      \`e quasi totalmente sbilanciato a destra a meno di combinazioni
+				fortunose. Dato che le operazioni di ``and'' ed ``or'' sono commutative
+				(cio\`e: $A \wedge B = B \wedge A$, e lo stesso per l'operazione di ``or''),
+				si pu\`o pensare di bilanciare l'albero in modo tale da ridurne la sua
+				complessit\`a e, quindi, migliorare la sua efficienza durante l'expression
+				evaluation
+	\item il parser adesso \`e totalmente separato dal tokenizer, ovvero viene
+	      prima generata una lista di token e solo successivamente, quando questa
+				lista \`e completa, viene passata al parser (vedi \ref{sec:parsing-overview}).
+				Questo semplifica la gestione delle operazioni ma si potrebbe rendere
+				questa procedura pi\`u efficiente utilizzando un incremental parser,
+				ovvero il parser richiede token (ed effettua la procedura di parsing
+				vero e proprio nel frattempo) solo nel momento in cui gli servono. In questo
+				modo inoltre, se dovessero essere presenti errori all'interno del sorgente,
+				verrebbero riconosciuti subito, e non al termine della procedura di
+				parsing
+\end{itemize}
+
+\'E possibile inoltre pensare ad un'evoluzione di ANT prevedendo il supporto per
+risoluzioni di problemi con pi\`u agenti operanti nello stesso spazio di ricerca, pertanto
+introducendo il supporto agli algoritmi per sistemi multi agente quali minimax, AO* e
+cos\`i via.
+
+Il processo di matching, come implementato al momento in ANT, \`e notevolmente
+inefficiente. Esistono algoritmi che permettono di velocizzare questo processo,
+quale ad esempio quello descritto in \cite{357169} che gestisce l'unificazione
+tramite un approccio differente, nonch\'e pi\`u efficiente.
+
+Un ulteriore passo verso la migliorazione delle performance, vero problema
+dei sistemi di questo genere, si pu\`o fare distribuendo il carico di lavoro su
+pi\`u processori e/o macchine. Considerato soprattutto che nei processori moderni si
+tende ad aumentare il numero di \textit{core} piuttosto che la velocit\`a del
+singolo processore, la parallelizzazione del calcolo, ergo la distribuzione del
+carico di lavoro, pu\`o portare ad un miglioramento significante nelle prestazioni
+dell'intero programma.
+
+In ANT ad esempio \`e facile individuare nel processo di unificazione descritto in
+\ref{sec:matching} un grosso collo di bottiglia. La procedura pu\`o, tuttavia,
+essere scomposta in sotto problemi. Essendo generato un albero, \`e facile vedere
+la risoluzione di un certo cammino come un sotto problema del problema pi\`u generale
+dell'unificazione. Tralaltro, questo sotto problema \`e relativamente indipendente
+dagli altri sotto problemi, nel senso che l'unificazione generata sar\`a o meno valida
+indipendentemente dall'esito dell'unificazione rispetto agli altri sotto problemi.
+
+Un possibile metodo di parallelizzazione del calcolo pu\`o esser dato dal modello di
+programmazione ``Map Reduce'' \cite{mapreduce-osdi}. Difatti possiamo pensare di
+fare il ``map'' di tutti i cammini generati e successivamente, usare la fase di
+``reduce'' per considerare solo quelli che hanno prodotto un applicazione valida
+della regola.
+\end{section}
+
+\begin{section}{Ringraziamenti}
+Rngraziamo P. Norvig e S. Russell per la conoscenza condivisa tramite \textit {il biblico}
+``Artificial intelligence: a modern approach'',  A. Newell e H. Simon per essere stati i
+pionieri di questa affascinante disciplina, \textit{and last but not least} la professoressa
+Esposito per la tenacia e la passione che infonde nei (durante) i suoi insegnamenti e il
+professor Nicola Di Mauro per la disponibilit\`a e il supporto. 
+\end{section}	
+\end{chapter}

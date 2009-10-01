@@ -1,0 +1,335 @@
+\begin{chapter}{Appendice}
+
+\begin{section}{Il gioco dell'8}
+\label{sec:gioco-filetto}
+
+Il gioco dell'8 consiste nell'ordinare dei tasselli, numerati da 1 ad 8 pi\`u una
+casella vuota, in senso orario, in un quadrato di dimensioni 3x3 lasciando la casella
+vuota al centro, ovvero portando i tasselli in questa posizione:
+
+\begin{center}
+\begin{tabular}{| c | c | c |}
+\hline
+1 & 2 & 3\\\hline
+8 &   & 4\\\hline
+7 & 6 & 5\\\hline
+\end{tabular}
+\end{center}
+
+L'ordinamento pu\`o avvenire spostando i tasselli verso la casella vuota, quindi
+i movimenti permessi su un tassello sono solo quelli di uno spostamento a destra,
+sinistra, sopra ed in sotto a seconda di dove si trovi la casella vuota.
+
+La configurazione iniziale consiste in un quadrato i cui tasselli sono stati
+mischiati, tuttavia non tutte le configurazioni iniziali sono valide, ovvero
+non \`e detto che una configurazione generata casualmente sia risolvibile. Un
+possibile (e sicuro) metodo di generazione di una configurazione casuale consiste
+nel partire dalla configurazione obiettivo e spostare casualmente\footnote{l'idea
+di generare configurazioni \textit{casuali} tramite un algoritmo che \`e predicibile
+per definizione pu\`o apparire in qualche modo paradossale e difatti lo \`e. Si
+rimanda tuttavia l'approfondimento di questo problema a testi specializzati dato
+che l'argomento esula dall'oggetto di questa discussione.} i tasselli.
+In questo modo la configurazione generata sar\`a sempre risolvibile, infatti
+ci sar\`a almeno un cammino che porta alla risoluzione del problema (basta
+seguire a ritroso il procedimento che ha portato alla generazione della
+configurazione in esame).
+\end{section}
+
+\begin{section}{Problem Solving}
+\label{sec:problem-solving}
+Come gi\`a accennato nel paragrafo \ref{sec:heuristicdef}, il problem
+solving comprende una serie di metodi atti a costruire programmi che mirano a raggiungere
+obiettivi, spesso indeterminati e incerti. Per raggiungere tale obiettivo \`e necessaria
+una descrizione, anche se parziale o incompleta, di una situazione presente e di una
+situazione desiderata. Queste situazioni possono essere rappresentate con schemi (o
+linguaggi) che siano sufficientemente ricchi da permetterci di descrivere entit\`a,
+eventi, oggetti o casi (situazioni) ed eventualmente differenze tra coppie di situazioni.
+Inoltre \`e necesaria una lista di operatori, definiti in un linguaggio che fa riferimento
+al processo solutivo, che applicati a tali situazioni permettono di ottenerne delle nuove.
+In aggiunta, ogni sequenza di operatori pu\`o essere considerata un operatore. In questo
+modo, si pu\`o pensare alla soluzione di un problema come ad un operatore (composto) nel
+linguaggio di processo che trasforma l'oggetto che descrive la situazione iniziale
+nell'oggetto che descrive la situazione desiderata.
+\end{section}
+
+\begin{section}{Confronto con CLIPS}
+\label{sec:clips-comparison}
+Abbiamo voluto mettere a confronto i due sistemi per osservarne le differenze di
+comportamento, sia in termini prestazionali che in termini di paradigmi adottati.
+Innanzitutto, CLIPS\footnote{http://clipsrules.sf.net} utilizza l'algoritmo RETE
+(vedi \cite{rete}) per il pattern matching che \`e estremamente pi\`u efficiente
+di quello utilizzato da ANT, oltre ad essere asintoticamente indipendente sia dal
+numero di regole che dal numero di fatti presenti (cosa, purtroppo, non vera in ANT).
+
+Il termine di paragone principale \`e stato, come gi\`a pi\`u volte osservato nel
+corso di questo scritto, quello del gioco dell'8. CLIPS mette a disposizione pi\`u
+strategie di risoluzione di conflitti ma, purtroppo, nessuna delle quali fa parte
+della categoria degli algoritmi informati come A* o hill climbing. Una conseguenza
+di ci\`o \`e stata che l'unico algoritmo di risoluzione dei conflitti che pu\`o
+risolvere il gioco dell'otto in CLIPS \`e stato quello random, ovvero la scelta
+di una regola, tra quelle applicabili, a caso. Il problema principale \`e che non
+viene messa a disposizione una \textit{memoria} degli stati precedenti (nonostante
+sia in realt\`a implementabile esplicitamente), pertanto tutti gli altri algoritmi
+testati portano in una sequenza ciclica infinita il programma, come ad esempio lo
+spostamento in circolo del tassello vuoto (es: sx, poi su, poi dx, poi gi\`u).
+
+Inoltre, non \`e definito esplicitamente uno stato finale (ma ne \`e definito
+uno iniziale). Il controllo di raggiungimento della combinazione vincente deve,
+quindi, avvenire sotto forma di regola che si attiver\`a solo ed esclusivamente
+quando i tasselli saranno nella posizione richiesta.
+
+Questo ha comportato una strategia di risoluzione leggermente diversa rispetto a
+quella vista in ANT per quanto riguarda il gioco dell'otto con prestazioni
+da parte dei due sistemi abbastanza diverse.
+Prendendo in esempio due stati iniziali, il primo che richiede un minimo di due
+mosse per essere risolto, ed il secondo che ne richiede sette, abbiamo fatto un
+confronto sull'esecuzione. Con CLIPS infatti, nonostante la risoluzione sia
+palesemente pi\`u veloce, l'algoritmo fornisce una sequenza risolutiva che contiene
+al suo interno molte pi\`u mosse del necessario per quanto riguarda il caso della
+configurazione di difficolt\`a ``media'' con un minimo di sette mosse (ne fornisce
+infatti un numero variabile tra le 17 e 30), riuscendo comunque a risolvere il caso
+semplice con esattamente due mosse.
+\end{section}
+
+\begin{section}{Grammatica del linguaggio}
+\label{sec:grammar}
+Segue la notazione in sintassi BNF estesa della grammatica del
+linguaggio utilizzato:
+
+\begin{verbatim}
+<cifra> := 1|2|3|4|5|6|7|8|9|0
+
+<numero> := <cifra> | <cifra> <numero>
+
+<lettera> := a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|w|x|y|z
+
+<stringa> := '"' <lettera>* '"'
+
+<identificatore> := <lettera> |
+                    <numero> |
+                    <lettera><identificatore> |
+                    <numero><identificatore>
+
+<espressione> := <predicato> |
+                 <predicato> 'and' <espressione> |
+                 <predicato> 'or' <espressione> |
+                 '(' <espressione> ')'
+
+<argomento> := <numero> | <stringa>
+
+<argomenti> := <argomento> | <argomento> ','
+
+<azione> := <nomepredicato>'(' <argomenti> ')' ';' |
+            <nomepredicato>'(' <argomenti> ')' ';' <azione>
+
+<regola> := 'beginRule' <identificatore>
+               <espressione>
+               '>'
+               <azione>
+            'endRule'
+
+<heuristica> := 'beginHeuristic' <identificatore>
+                   <azione>
+                'endHeuristic'
+
+<attributi> := (<identificatore> '=' (<stringa>|<numero>) ';')+
+
+<fatto> := 'beginFact' <identificatore>
+             <attributi>
+           'endFact'
+
+<opzioni> := 'set'
+               <attributi>
+             'endSet'
+
+<MAIN> := <opzioni> (<fatto>)+ (<regola>)+ (<euristica>)+
+\end{verbatim}
+
+\end{section}
+
+\begin{section}{Predicati disponibili}
+\label{sec:predicates}
+
+	\begin{subsection}{Predicati per la LHS}
+	\label{sec:predicates-lhs}
+
+		\begin{subsubsection}{equals}
+		\label{sec:predicates-lhs-equals}
+		Sintassi: \verb!equals([attributo], valore1, valore2, ..., valoreN)!\\
+		Se non \`e specificato il nome dell'attributo, allora richiede solo due parametri e
+		ritorna vero se sono uguali, falso altrimenti. Nel caso in cui sia specificato
+		il nome dell'attributo come \verb,attributo,, il quale ha come valore
+		\verb![ n1, n2, ..., nM ]!, ritorna vero se e solo se $ N = M $ e
+		$ valore_{i} = n_{i} \forall i $.
+		\end{subsubsection}
+
+		\begin{subsubsection}{different}
+		\label{sec:predicates-lhs-different}
+		Sintassi: \verb!different([attributo], valore1, valore2, ..., valoreN)!\\
+		Se non \`e specificato il nome dell'attributo, allora richiede solo due parametri e
+		ritorna vero se sono diversi, falso altrimenti. Nel caso in cui sia specificato
+		il nome dell'attributo come \verb,attributo,, il quale ha come valore
+		\verb![ n1, n2, ..., nM ]!, ritorna vero se e solo se $ N \neq M $ oppure
+		$ \exists i \ni' valore_{i} \neq n_{i} $.
+		\end{subsubsection}
+
+		\begin{subsubsection}{gt}
+		\label{sec:predicates-lhs-gt}
+		Sintassi: \verb!gt(valore1, valore2)!\\
+		Ritorna vero se \verb,valore1, \`e maggiore di \verb,valore2,. Questo
+		predicato si applica solo a valori numerici, nel caso di stringhe ritorna
+		sempre falso.
+		\end{subsubsection}
+
+		\begin{subsubsection}{gte}
+		\label{sec:predicates-lhs-gte}
+		Sintassi: \verb!gte(valore1, valore2)!\\
+		Ritorna vero se \verb,valore1, \`e maggiore o uguale di \verb,valore2,.
+		Questo predicato si applica solo a valori numerici, nel caso di stringhe ritorna
+		sempre falso.
+		\end{subsubsection}
+
+		\begin{subsubsection}{lt}
+		\label{sec:predicates-lhs-lt}
+		Sintassi: \verb!lt(valore1, valore2)!\\
+		Ritorna vero se \verb,valore1, \`e minore di \verb,valore2,. Questo
+		predicato si applica solo a valori numerici, nel caso di stringhe ritorna
+		sempre falso.
+		\end{subsubsection}
+
+		\begin{subsubsection}{lte}
+		\label{sec:predicates-lhs-lte}
+		Sintassi: \verb!lte(valore1, valore2)!\\
+		Ritorna vero se \verb,valore1, \`e minore o uguale di \verb,valore2,.
+		Questo predicato si applica solo a valori numerici, nel caso di stringhe ritorna
+		sempre falso.
+		\end{subsubsection}
+
+		\begin{subsubsection}{within}
+		\label{sec:predicates-lhs-within}
+		Sintassi: \verb!within(valore, min, max)!\\
+		Ritorna vero se \verb,valore, \`e compreso tra \verb,min, e \verb,max, (inclusi),
+		ovvero se $ valore \in [ min, max ] $.
+		Questo predicato si applica solo a valori numerici, nel caso di stringhe ritorna
+		sempre falso.
+		\end{subsubsection}
+
+		\begin{subsubsection}{true}
+		\label{sec:predicates-lhs-true}
+		Sintassi: \verb!true(...)!\\
+		Torna sempre vero, indipendentemente da quanti e quali parametri gli vengono 
+		passati in input.
+		\end{subsubsection}
+
+		\begin{subsubsection}{false}
+		\label{sec:predicates-lhs-false}
+		Sintassi: \verb!false(...)!\\
+		Torna sempre falso, indipendentemente da quanti e quali parametri gli vengono 
+		passati in input.
+		\end{subsubsection}
+
+	\end{subsection}
+
+	\begin{subsection}{Predicati per la RHS}
+	\label{sec:predicates-rhs}
+
+		\begin{subsubsection}{add}
+		\label{sec:predicates-rhs-add}
+		Sintassi: \verb!add(valore1, valore2)!\\
+		Aggiunge a \verb,valore2, a \verb,valore1,. \`E necessario che \verb,valore1, sia una
+		variabile per far si che il risultato dell'operazione venga salvato. Inoltre, sia
+		\verb,valore1, che \verb,valore2, devono essere valori numerici (o in caso di variabili,
+		devono essere gi\`a definite).
+		\end{subsubsection}
+
+		\begin{subsubsection}{sub}
+		\label{sec:predicates-rhs-sub}
+		Sintassi: \verb!sub(valore1, valore2)!\\
+		Sottrae a \verb,valore2, a \verb,valore1,. \`E necessario che \verb,valore1, sia una
+		variabile per far si che il risultato dell'operazione venga salvato. Inoltre, sia
+		\verb,valore1, che \verb,valore2, devono essere valori numerici (o in caso di variabili,
+		devono essere gi\`a definite).
+		\end{subsubsection}
+
+		\begin{subsubsection}{mul}
+		\label{sec:predicates-rhs-mul}
+		Sintassi: \verb!mul(valore1, valore2)!\\
+		Moltiplica \verb,valore2, per \verb,valore1,. \`E necessario che \verb,valore1, sia una
+		variabile per far si che il risultato dell'operazione venga salvato. Inoltre, sia
+		\verb,valore1, che \verb,valore2, devono essere valori numerici (o in caso di variabili,
+		devono essere gi\`a definite).
+		\end{subsubsection}
+
+		\begin{subsubsection}{define}
+		\label{sec:predicates-rhs-define}
+		Sintassi: \verb!define(nomevariabile, valore)!\\
+		Dichiara una nuova variabile chiamata \verb,nomevariabile,, inizializzata col valore e
+		tipo di \verb,valore,.
+		\end{subsubsection}
+
+		\begin{subsubsection}{undefine}
+		\label{sec:predicates-rhs-undefine}
+		Sintassi: \verb!undefine(variabile1, variable2, ..., variabileN)!\\
+		Cancella le variabili specificate. Se le variabili non esistono le ignora.
+		\end{subsubsection}
+
+		\begin{subsubsection}{find}
+		\label{sec:predicates-rhs-find}
+		Sintassi: \verb!find(attributo, valore1, valore2, ..., valoreN)!\\
+		Effettua una \textit{approximate search} sul fatto in analisi. Se \verb,attributo, \`e
+		una variabile non precedentemente definita, allora \verb,find, iterer\`a su tutti
+		gli attributi all'interno del fatto cercando un match con i valori di tipo non
+		variabile passati come parametro. Appena trova un attributo che soddisfa i requisiti,
+		valorizza tutte le variabili non risolte con i valori dell'attributo. Si ferma al
+		primo attributo che soddisfa la richiesta.
+		\noindent Se \verb,attributo, \`e una costante allora la sostituzione verr\`a fatta
+		sui valori dell'attributo del fatto di nome \verb,attributo, come spiegato in
+		precedenza.
+		\end{subsubsection}
+
+		\begin{subsubsection}{insert}
+		\label{sec:predicates-rhs-insert}
+		Sintassi: \verb!insert(attributo, valore1, valore2, ..., valoreN)!\\
+		Inserisce un nuovo attributo nel fatto in esame di nome \verb,attributo, e con i
+		valori da \verb,valore1, a \verb,valoreN,.
+		\end{subsubsection}
+
+		\begin{subsubsection}{remove}
+		\label{sec:predicates-rhs-remove}
+		Sintassi: \verb!remove(attributo)!\\
+		Rimuove l'attributo \verb,attributo, dal fatto in analisi.
+		\end{subsubsection}
+
+		\begin{subsubsection}{edit}
+		\label{sec:predicates-rhs-edit}
+		Sintassi: \verb!edit(attributo, valore1, valore2, ..., valoreN)!\\
+		Sostiuisce i valori di \verb,attributo, con quelli da \verb,valore1, a \verb,valoreN,.
+		\end{subsubsection}
+
+		\begin{subsubsection}{equals}
+		\label{sec:predicates-rhs-equals}
+		Sintassi: \verb!equals([attributo], valore1, valore2, ..., valoreN, risultato)!\\
+		Verifica l'uguaglianza di attributi come descritto in \ref{sec:predicates-lhs-equals}
+		(\verb,equals,) e salva il risultato dell'operazione nella variabile specificata per
+		\verb,risultato, come 1 se l'uguaglianza era valida o come 0 altrimenti.
+		\end{subsubsection}
+
+		\begin{subsubsection}{different}
+		\label{sec:predicates-rhs-different}
+		Sintassi: \verb!different([attributo], valore1, valore2, ..., valoreN, risultato)!\\
+		Verifica la non uguaglianza di attributi come descritto in \ref{sec:predicates-lhs-different}
+		(\verb,different,) e salva il risultato dell'operazione nella variabile specificata per
+		\verb,risultato, come 1 se l'uguaglianza era non valida o come 0 altrimenti.
+		\end{subsubsection}
+
+        \begin{subsubsection}{return}
+        \label{sec:predicates-rhs-return}
+        Sintassi: \verb!return(valore)!\\
+        Specifica il valore di ritorno della funzione euristica. Utilizzabile esclusivamente durante
+        la definizione di un'euristica (ovvero entro il blocco \verb,beginHeuristic,-\verb,endHeuristic,).
+        \end{subsubsection}
+
+	\end{subsection}
+\end{section}
+
+\end{chapter}

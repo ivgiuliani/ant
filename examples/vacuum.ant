@@ -1,0 +1,45 @@
+set
+	start "initial";
+	stop "final";
+	algo "bfs";
+	limit 15;
+endSet
+
+beginFact initial
+	vacuum = "sx";
+	sx =  "sporcizia";
+	dx = "sporcizia";
+endFact
+
+beginFact final
+	vacuum = "dx";
+	sx = "pulito";
+	dx = "pulito";
+endFact
+
+beginRule move_vacuum_from_left_to_right
+	equals("vacuum", "sx")
+	>
+	edit("vacuum", "dx");
+endRule
+
+beginRule move_vacuum_from_right_to_left
+	equals("vacuum", "sx")
+	>
+	edit("vacuum", "dx");
+endRule
+
+beginRule clean_left
+	equals("vacuum", "sx") and
+	equals("sx", "sporcizia")
+	>
+	edit("sx", "pulito");
+endRule
+
+beginRule clean_right
+	equals("vacuum", "dx") and
+	equals("dx", "sporcizia")
+	>
+	edit("dx", "pulito");
+endRule
+

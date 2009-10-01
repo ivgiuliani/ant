@@ -1,0 +1,42 @@
+\documentclass[12pt,a4paper,fullpage,doublespace]{report}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage[pdftex]{graphicx}
+\usepackage[italian]{babel}
+\usepackage[latin1]{inputenc}
+\usepackage{verbatim}
+\usepackage{color}
+\usepackage{fancyhdr}
+
+\newcommand{\needreview}{
+	\fbox{
+		\textcolor{red}{
+			\textbf{\textit{Questa parte del documento necessita di revisione}}
+		}
+	}
+}
+
+\newcommand{\blankpage}{
+    \begin{titlepage}
+        \fancyhf{} \newpage \mbox{} \newpage
+    \end{titlepage}
+}
+
+\begin{document}
+\setcounter{page}{0}
+\setcounter{section}{0}
+\input{./title.tex}
+\blankpage
+\input{./tex/quotations.tex}
+\tableofcontents
+\input{./tex/introduzione.tex}
+\input{./tex/funzionamento.tex}
+\input{./tex/algoritmi.tex}
+\input{./tex/conclusioni.tex}
+\input{./tex/appendice.tex}
+
+% bibliography
+\bibliographystyle{alpha}
+\bibliography{bibliography}
+
+\end{document}

@@ -1,0 +1,85 @@
+set
+	start "iniziale";
+	stop "finale";
+	algo "bfs";
+	limit 15;
+endSet
+
+beginFact iniziale
+	agricoltore = "riva-vicina";
+	cavolo = "riva-vicina";
+	pecora = "riva-vicina";
+	lupo = "riva-vicina";
+endFact
+
+beginFact finale
+	agricoltore = "riva-lontana";
+	cavolo = "riva-lontana";
+	pecora = "riva-lontana";
+	lupo = "riva-lontana";
+endFact
+
+beginRule sposta_agricoltore_sulla_riva_lontana
+	equals("agricoltore", "riva-vicina") and
+	((equals("pecora", riva) and different("lupo", riva)) and
+	 (equals("pecora", riva) and different("cavolo", riva)))
+	>
+	edit("agricoltore", "riva-lontana");
+endRule
+
+beginRule sposta_agricoltore_sulla_riva_vicina
+	equals("agricoltore", "riva-lontana") and
+	((equals("pecora", riva) and different("lupo", riva)) and
+	 (equals("pecora", riva) and different("cavolo", riva)))
+	>
+	edit("agricoltore", "riva-vicina");
+endRule
+
+beginRule sposta_agricoltore_e_pecora_sulla_riva_lontana
+	equals("agricoltore", "riva-vicina") and
+	equals("pecora", "riva-vicina")
+	>
+	edit("agricoltore", "riva-lontana");
+	edit("pecora", "riva-lontana");
+endRule
+
+beginRule sposta_agricoltore_e_pecora_sulla_riva_vicina
+	equals("agricoltore", "riva-lontana") and
+	equals("pecora", "riva-lontana")
+	>
+	edit("agricoltore", "riva-vicina");
+	edit("pecora", "riva-vicina");
+endRule
+
+beginRule sposta_agricoltore_e_cavolo_sulla_riva_lontana
+	equals("agricoltore", "riva-vicina") and
+	equals("cavolo", "riva-vicina")
+	>
+	edit("agricoltore", "riva-lontana");
+	edit("cavolo", "riva-lontana");
+endRule
+
+beginRule sposta_agricoltore_e_cavolo_sulla_riva_vicina
+	equals("agricoltore", "riva-lontana") and
+	equals("cavolo", "riva-lontana")
+	>
+	edit("agricoltore", "riva-vicina");
+	edit("cavolo", "riva-vicina");
+endRule
+
+beginRule sposta_agricoltore_e_lupo_sulla_riva_lontana
+	equals("agricoltore", "riva-vicina") and
+	equals("lupo", "riva-vicina")
+	>
+	edit("agricoltore", "riva-lontana");
+	edit("lupo", "riva-lontana");
+endRule
+
+beginRule sposta_agricoltore_e_lupo_sulla_riva_vicina
+	equals("agricoltore", "riva-lontana") and
+	equals("lupo", "riva-lontana")
+	>
+	edit("agricoltore", "riva-vicina");
+	edit("lupo", "riva-vicina");
+endRule
+

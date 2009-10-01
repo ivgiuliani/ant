@@ -1,0 +1,5 @@
+- translate the documentation from italian to english as well as examples
+  in the examples/ dir and comments into the source code
+- the system actually includes several memory leaks which is not good
+- it doesn't work on windows
+

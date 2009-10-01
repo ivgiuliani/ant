@@ -1,0 +1,26 @@
+ANT is a tool for building single-agent, rule based systems. It consists of a
+rule based language for the problem definitions, a basic pattern matching
+engine and different selectable algorithms for general problem solving.
+
+It is useful when trying to solve problems where the initial and final state
+are known as well as the rules to manipulate states, but the steps (the order
+the rules should be applied) for going from the initial to the final step are
+unknown.
+
+ANT was born as a simple university project: that means that many things have
+been simplified (the matching algorithm is far from being efficient compared
+to real world alternatives like CLIPS) and many aspects of good software
+development (like unit tests) have been neglecteds due to rigid time
+constraints. As such, the documentation is exhaustive but it is written
+entirely in italian.
+
+CMake is required to build ANT. The following instruction set should be enough
+to get ANT compiled, assuming that CMake is correctly installed:
+
+  $ mkdir build
+  $ cd build
+  $ cmake ..
+  $ make
+
+The compiled output named 'ant' will be under the build/src directory.
+
