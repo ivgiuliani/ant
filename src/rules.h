@@ -3,6 +3,7 @@
 
 #include <list>
 #include <queue>
+#include <stdint.h>
 
 #include "debug.h"
 #include "expression.h"

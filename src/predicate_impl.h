@@ -64,7 +64,6 @@ PREDICATE_RHS(__fn_find_search_attributes, funcmem, fact, params);
  * Richiedi obbligatoriamente n parametri
  */
 void inline
-__ATTR(__FASTCALL)
 REQUIRE_N_PARAMS(string name, vector<PredicateParam> params, unsigned int n) {
   if (params.size() != n) {
     string err(name);
@@ -81,7 +80,6 @@ REQUIRE_N_PARAMS(string name, vector<PredicateParam> params, unsigned int n) {
  * Richiedi obbligatoriamente almeno n parametri
  */
 void inline
-__ATTR(__FASTCALL)
 REQUIRE_ATLEAST_N_PARAMS(string name, vector<PredicateParam> params, unsigned int n) {
   if (params.size() < n) {
     string err(name);

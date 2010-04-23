@@ -19,15 +19,6 @@
 # error("Unknown environment, can't compile")
 #endif
 
-/* Usiamo la fastcall per le funzioni chiamate piu' spesso (attualmente
- * supportato solo g++)
- */
-#if defined(__GNUC__)
-# define __FASTCALL fastcall
-#else
-# define __FASTCALL
-#endif
-
 /* Assumiamo che la funzione non lanci nessuna eccezione durante la sua
  * esecuzione. Questo permette al compilatore di non inserire il meccanismo
  * di stack unwind per le eccezioni quando specifichiamo questo parametro

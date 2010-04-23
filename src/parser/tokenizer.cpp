@@ -13,6 +13,7 @@
 #include <cstring>
 #include <fstream>
 #include <sstream>
+#include <stdint.h>
 
 #include "debug.h"
 #include "parser/language.h"

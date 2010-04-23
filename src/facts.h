@@ -37,7 +37,7 @@ class Fact {
     void add_attribute(string, DTArray);
 
     void del_attribute(string);
-    bool __ATTR(__FASTCALL, __NOTHROW, __HOT) has_attribute(string);
+    bool __ATTR(__NOTHROW, __HOT) has_attribute(string);
 
     DTArray* get_attribute(string);
     attrmap *get_attribute_list() { return &this->attributes; };

@@ -40,7 +40,7 @@ class DTArrayItem {
 		};
 
 		ITEM_TYPE get_type() { return this->type; };
-		string __ATTR(__FASTCALL, __HOT) get_value() {
+		string __ATTR(__HOT) get_value() {
 			if (this->type == ITEM_INT) {
 				stringstream ss;
 				ss << this->value;

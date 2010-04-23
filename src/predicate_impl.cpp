@@ -20,7 +20,7 @@
  * Nota: questa funzione e` critica in quanto e` una delle funzioni piu` chiamate
  */
 static const void
-__ATTR(__FASTCALL, __HOT)
+__ATTR(__HOT)
 RESOLVE_VARIABLE(const Fact* fact, FuncMemory* funcmem, PredicateParam *orig) {
   debug(orig->get());
   if (orig->get_type() != PARAM_VAR) return;
@@ -60,7 +60,6 @@ RESOLVE_VARIABLE(const Fact* fact, FuncMemory* funcmem, PredicateParam *orig) {
  * variabile sono gia` risolti a costanti
  */
 static const void
-__ATTR(__FASTCALL)
 RESOLVE_PARAMS(const Fact* fact, FuncMemory* funcmem, vector<PredicateParam> *params) {
   vector<PredicateParam> v;
   unsigned int i;

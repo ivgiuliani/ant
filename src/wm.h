@@ -3,6 +3,7 @@
 
 #include <list>
 #include <string>
+#include <stdint.h>
 
 #include "expression.h"
 #include "facts.h"

@@ -43,7 +43,7 @@ class Predicate {
      * Stringhe, numeri e variabili
      */
     void add_parameter(PredicateParam);
-    vector<PredicateParam> __ATTR(__FASTCALL) get_parameters();
+    vector<PredicateParam> get_parameters();
     void set_parameters(vector<PredicateParam>);
     void set_name(string);
     string get_name();

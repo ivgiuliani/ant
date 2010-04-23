@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <sys/time.h>
+#include <stdint.h>
 #include <fstream>
 #include <iostream>
 #include <iomanip>
