@@ -16,8 +16,9 @@ bool AndBooleanExpr::evaluate(FuncMemory *funcmem, Fact *fact) {
 
 /* Funzione di valutazione per l'or */
 bool OrBooleanExpr::evaluate(FuncMemory *funcmem, Fact *fact) {
-  return (this->cond1->evaluate(funcmem, fact) ||
-          this->cond2->evaluate(funcmem, fact));
+  /* Usa la legge di de morgan per portare questa formula in AND */
+  return (!this->cond1->evaluate(funcmem, fact) &&
+          !this->cond2->evaluate(funcmem, fact));
 };
 
 /*
